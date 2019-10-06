@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package io.demo.storage.service.grpc.domain;
+
+/*
+ * A graph vertex. Each vertex is identified by vertex label, and name
+ */
+message Vertex {
+  string label = 1;
+  string name = 2;
+}
+
+/*
+ * A graph edge between two vertices
+ */
+message Edge {
+  Vertex vertex1 = 1;
+  Vertex vertex2 = 2;
+  string label = 3;
+  DoubleValue weight = 4;
+}
+
+/*
+ * A wrapper for values of type double, which allows send/return null
+ */
+message DoubleValue {
+  double value = 1;
+}
+
+/*
+ * A response of create vertex operation
+ */
+message CreateVertexResponse {
+}
+
+/*
+ * A request of all vertices with specified label
+ */
+message ListVerticesRequest {
+  string label = 1;
+}
+
+/*
+ * A response of list vertices operation
+ */
+message ListVerticesResponse {
+  repeated string names = 1;
+}
+
+/*
+ * A response of delete vertex operation
+ */
+message DeleteVertexResponse {
+}
+
+/*
+ * A response of create edge operation
+ */
+message CreateEdgeBidirectionalResponse {
+}
+
+/*
+ * A response of check edge existence operation
+ */
+message EdgeExistsBidirectionalResponse {
+  DoubleValue weight = 1;
+}
+
+/*
+ * A response of delete edge operation
+ */
+message DeleteEdgeBidirectionalResponse {
+}
+
+/*
+ * A path between two vertices, includes total weight
+ */
+message GraphRoute {
+  DoubleValue totalWeight = 1;
+  repeated string vertices = 2;
+}
+
+/*
+ * A response of search path operation
+ */
+message FindPathsBidirectionalResponse {
+  repeated GraphRoute paths = 1;
+}
+
+/*
+ * A service for graph manipulations
+ */
+service StorageService {
+  // create graph vertex
+  rpc createVertex (Vertex) returns (CreateVertexResponse);
+
+  // search by label and list all vertices names
+  rpc listAllVertexNamesByLabel(ListVerticesRequest) returns (ListVerticesResponse);
+
+  // delete vertex from graph
+  rpc deleteVertex(Vertex) returns (DeleteVertexResponse);
+
+  // create edge between two vertices, with specified weight
+  rpc createEdgeBidirectional(Edge) returns (CreateEdgeBidirectionalResponse);
+
+  // check if edge exists, return weight
+  rpc edgeExistsBidirectional(Edge) returns (EdgeExistsBidirectionalResponse);
+
+  // find and delete edge between two vertices
+  rpc deleteEdgeBidirectional(Edge) returns (DeleteEdgeBidirectionalResponse);
+
+  // search paths between any two vertices, return paths found, and total weights
+  rpc findPathsBidirectional(Edge) returns (FindPathsBidirectionalResponse);
+}

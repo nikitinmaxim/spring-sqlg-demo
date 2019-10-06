@@ -1,0 +1,9 @@
+logging:
+  level:
+    org.springframework: info
+    io.demo: ${LOG_LEVEL}
+
+sqlg.jdbc:
+  url: ${MARIADB_URL}
+  username: ${MARIADB_USERNAME}
+  password: ${MARIADB_PASSWORD}

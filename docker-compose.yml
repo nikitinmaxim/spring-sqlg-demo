@@ -1,0 +1,113 @@
+version: '3.7'
+
+services:
+  mariadb:
+    image: mariadb:10.4.8-bionic
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 640M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - demo-network
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+  
+  adminer:
+    image: adminer
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 640M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - 8777:8080
+    networks:
+      - demo-network
+  
+  storage-service:
+    image: demo-storage-service:1.0
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - demo-network
+    environment:
+      LOG_LEVEL: trace
+      MARIADB_URL: jdbc:mariadb://mariadb:3306/?useSSL=false
+      MARIADB_USERNAME: root
+      MARIADB_PASSWORD: "${DB_PASSWORD}"
+
+  train-stations-service:
+    image: demo-train-stations-service:1.0
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - 8778:8080
+    networks:
+      - demo-network
+    environment:
+      LOG_LEVEL: trace
+      STORAGE_SERVICE_HOST: storage-service
+      STORAGE_SERVICE_PORT: "6565"
+
+networks:
+  demo-network:
+    driver: overlay

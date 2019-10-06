@@ -1,0 +1,8 @@
+logging:
+  level:
+    org.springframework: info
+    io.demo: ${LOG_LEVEL}
+
+storage-service:
+  host: ${STORAGE_SERVICE_HOST}
+  port: ${STORAGE_SERVICE_PORT}
